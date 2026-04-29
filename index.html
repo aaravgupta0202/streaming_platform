@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>StreamVault | Watch Anywhere</title>
+<title>StreamVault | Netflix-style Streaming</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -18,9 +18,6 @@
     --accent: #e50914;
     --accent-hover: #b81d24;
     --success: #2e8b57;
-    --radius-sm: 8px;
-    --radius-md: 12px;
-    --radius-lg: 16px;
   }
 
   body {
@@ -30,7 +27,7 @@
     overflow-x: hidden;
   }
 
-  /* Header Netflix Style */
+  /* Header */
   .header {
     position: sticky;
     top: 0;
@@ -97,10 +94,6 @@
     outline: none;
   }
 
-  .search-bar input::placeholder {
-    color: var(--text-secondary);
-  }
-
   .genre-filter {
     display: flex;
     gap: 12px;
@@ -125,7 +118,6 @@
   .genre-chip:hover, .genre-chip.active {
     background: var(--accent);
     color: white;
-    border-color: var(--accent);
   }
 
   main {
@@ -134,7 +126,7 @@
 
   /* Hero Banner */
   .hero-banner {
-    height: 480px;
+    height: 560px;
     border-radius: 24px;
     margin-bottom: 40px;
     background-size: cover;
@@ -142,16 +134,17 @@
     position: relative;
     display: flex;
     align-items: flex-end;
-    padding: 40px;
-    box-shadow: inset 0 -120px 60px -30px rgba(0,0,0,0.8);
+    padding: 60px;
+    box-shadow: inset 0 -150px 80px -30px rgba(0,0,0,0.9);
   }
 
   .hero-content {
     max-width: 550px;
+    z-index: 2;
   }
 
   .hero-title {
-    font-size: 48px;
+    font-size: 52px;
     font-weight: 800;
     margin-bottom: 12px;
   }
@@ -174,6 +167,10 @@
     line-height: 1.5;
     margin-bottom: 24px;
     color: #ddd;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   .hero-buttons {
@@ -181,7 +178,7 @@
     gap: 16px;
   }
 
-  .btn-play, .btn-add {
+  .btn-play, .btn-add, .btn-watchlist {
     padding: 10px 28px;
     border-radius: 8px;
     font-weight: 700;
@@ -200,7 +197,7 @@
     background: #e6e6e6;
   }
 
-  .btn-add {
+  .btn-add, .btn-watchlist {
     background: rgba(109, 109, 110, 0.7);
     color: white;
   }
@@ -220,7 +217,6 @@
   .section-title {
     font-size: 24px;
     font-weight: 700;
-    letter-spacing: -0.5px;
   }
 
   .scroll-x {
@@ -235,7 +231,7 @@
     flex: 0 0 180px;
     cursor: pointer;
     transition: transform 0.25s;
-    border-radius: var(--radius-md);
+    border-radius: 12px;
     overflow: hidden;
   }
 
@@ -247,7 +243,7 @@
     width: 100%;
     aspect-ratio: 2/3;
     object-fit: cover;
-    border-radius: var(--radius-md);
+    border-radius: 12px;
     background: var(--bg-card);
   }
 
@@ -260,14 +256,14 @@
     text-overflow: ellipsis;
   }
 
-  /* Modal Styles (Netflix Popup) */
+  /* Modal */
   .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.9);
+    background: rgba(0,0,0,0.92);
     backdrop-filter: blur(16px);
     z-index: 1000;
     display: none;
@@ -436,7 +432,7 @@
     z-index: 10;
   }
 
-  /* Fullscreen Player */
+  /* Player */
   .player-full {
     position: fixed;
     top: 0;
@@ -498,10 +494,16 @@
 
   @keyframes spin { to { transform: rotate(360deg); } }
 
+  .empty-state {
+    text-align: center;
+    padding: 80px;
+    color: var(--text-secondary);
+  }
+
   @media (max-width: 768px) {
     .header { padding: 12px 20px; }
     main { padding: 0 16px 40px; }
-    .hero-banner { height: 380px; padding: 20px; }
+    .hero-banner { height: 420px; padding: 30px; }
     .hero-title { font-size: 32px; }
     .movie-card { flex: 0 0 140px; }
     .modal-container { max-width: 95%; }
@@ -516,12 +518,12 @@
   <div class="nav-links">
     <span class="nav-link active" data-category="movie">Movies</span>
     <span class="nav-link" data-category="tv">TV Shows</span>
-    <span class="nav-link" data-category="continue">Continue</span>
+    <span class="nav-link" data-category="continue">Continue Watching</span>
     <span class="nav-link" data-category="watchlist">My List</span>
   </div>
   <div class="search-bar">
     <span>🔍</span>
-    <input type="text" id="searchInput" placeholder="Search titles, actors, genres...">
+    <input type="text" id="searchInput" placeholder="Search movies or TV shows...">
   </div>
 </div>
 
@@ -533,7 +535,7 @@
   <div id="spinner" class="spinner"></div>
 </main>
 
-<!-- Modal Preview -->
+<!-- Modal -->
 <div id="detailModal" class="modal-overlay">
   <div class="modal-container">
     <button class="close-modal" id="closeModalBtn">✕</button>
@@ -543,7 +545,7 @@
       <div id="modalStats" class="modal-stats"></div>
       <div class="modal-buttons">
         <button id="modalPlayBtn" class="btn-play">▶ Play</button>
-        <button id="modalSaveBtn" class="btn-add">+ My List</button>
+        <button id="modalSaveBtn" class="btn-watchlist">+ My List</button>
       </div>
       <div id="modalDesc" class="modal-desc"></div>
       <div id="modalInfoGrid" class="modal-info-grid"></div>
@@ -552,113 +554,105 @@
   </div>
 </div>
 
-<!-- Fullscreen Player -->
+<!-- Player -->
 <div id="playerOverlay" class="player-full">
   <div class="player-header-nav">
-    <button id="exitPlayerBtn" class="player-back">← Back</button>
+    <button id="exitPlayerBtn" class="player-back">← Back to Browse</button>
   </div>
   <iframe id="playerFrame" class="player-frame" allowfullscreen allow="autoplay; fullscreen"></iframe>
 </div>
 
 <script>
-  // ---------- IMDbAPI v2 + LocalStorage ----------
-  const IMDB_API = 'https://api.imdbapi.dev/v1';
+  // TMDB API Configuration
+  const TMDB_API = 'https://api.themoviedb.org/3';
+  const TMDB_KEY = '8f8c7b0e8aefce789115fc66fd672df1';
+  const IMG_BASE = 'https://image.tmdb.org/t/p/w500';
+  const BACKDROP_BASE = 'https://image.tmdb.org/t/p/original';
   const VIDAPI_MOVIE = 'https://vidapi.qzz.io/movie/';
   const VIDAPI_TV = 'https://vidapi.qzz.io/tv/';
-  
-  // State
-  let currentCategory = 'movie'; // movie, tv, continue, watchlist
+
+  // App State
+  let currentCategory = 'movie';
   let searchQuery = '';
   let selectedGenre = '';
-  let allMovies = [];
-  let allShows = [];
+  let moviesList = [];
+  let tvList = [];
   let watchlist = JSON.parse(localStorage.getItem('sv_watchlist') || '[]');
   let continueWatching = JSON.parse(localStorage.getItem('sv_continue') || '[]');
-  
   let currentModalData = null;
-  
-  // Genres list (common mapping)
-  const genreMap = {
-    'Action': 'Action', 'Adventure': 'Adventure', 'Animation': 'Animation', 'Comedy': 'Comedy',
-    'Crime': 'Crime', 'Documentary': 'Documentary', 'Drama': 'Drama', 'Family': 'Family',
-    'Fantasy': 'Fantasy', 'Horror': 'Horror', 'Romance': 'Romance', 'Sci-Fi': 'Sci-Fi',
-    'Thriller': 'Thriller'
-  };
-  
-  // Helper: fetch from IMDbAPI
-  async function fetchIMDb(endpoint) {
-    const res = await fetch(`${IMDB_API}${endpoint}`);
-    if (!res.ok) throw new Error('IMDb API error');
+
+  const genres = ['Action', 'Adventure', 'Animation', 'Comedy', 'Crime', 'Documentary', 'Drama', 'Family', 'Fantasy', 'Horror', 'Romance', 'Sci-Fi', 'Thriller'];
+
+  // Fetch from TMDB
+  async function fetchTMDB(endpoint) {
+    const res = await fetch(`${TMDB_API}${endpoint}?api_key=${TMDB_KEY}`);
+    if (!res.ok) throw new Error('TMDB error');
     return res.json();
   }
-  
-  // Search titles (movies or TV)
-  async function searchTitles(query, type = 'movie') {
-    try {
-      const titleType = type === 'movie' ? 'MOVIE' : 'TV_SERIES';
-      const url = `/titles?types=${titleType}&sortBy=SORT_BY_POPULARITY&limit=50${query ? `&search=${encodeURIComponent(query)}` : ''}`;
-      const data = await fetchIMDb(url);
-      return data.titles || [];
-    } catch(e) { console.warn(e); return []; }
-  }
-  
-  // Get full title details by ID
-  async function getTitleDetails(imdbId) {
-    return await fetchIMDb(`/titles/${imdbId}`);
-  }
-  
-  // Get episodes for a TV show
-  async function getEpisodes(imdbId, seasonNum) {
-    try {
-      const data = await fetchIMDb(`/titles/${imdbId}/episodes?season=${seasonNum}&pageSize=50`);
-      return data.episodes || [];
-    } catch(e) { return []; }
-  }
-  
-  // Get actor details
-  async function getActorDetails(nameId) {
-    return await fetchIMDb(`/names/${nameId}`);
-  }
-  
-  // Load hero and initial content
-  async function loadHome() {
+
+  async function loadInitialData() {
     document.getElementById('spinner').classList.add('active');
     try {
-      const movies = await searchTitles('', 'movie');
-      const shows = await searchTitles('', 'tv');
-      allMovies = movies.slice(0, 30);
-      allShows = shows.slice(0, 30);
-      renderHero(movies[0]);
+      const moviesRes = await fetchTMDB('/movie/top_rated?page=1');
+      const tvRes = await fetchTMDB('/tv/top_rated?page=1');
+      moviesList = moviesRes.results.slice(0, 30);
+      tvList = tvRes.results.slice(0, 30);
+      renderHero(moviesList[0]);
       renderSections();
       renderGenreFilters();
-    } catch(e) { console.error(e); }
+    } catch (e) {
+      console.error(e);
+      document.getElementById('contentSections').innerHTML = '<div class="empty-state">⚠️ Error loading content. Please check your connection.</div>';
+    }
     document.getElementById('spinner').classList.remove('active');
   }
-  
-  function renderHero(title) {
-    if (!title || currentCategory !== 'movie') {
+
+  async function searchContent(query) {
+    if (!query) return loadInitialData();
+    document.getElementById('spinner').classList.add('active');
+    try {
+      const movieSearch = await fetch(`${TMDB_API}/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(query)}`);
+      const tvSearch = await fetch(`${TMDB_API}/search/tv?api_key=${TMDB_KEY}&query=${encodeURIComponent(query)}`);
+      const movieData = await movieSearch.json();
+      const tvData = await tvSearch.json();
+      moviesList = movieData.results.slice(0, 30);
+      tvList = tvData.results.slice(0, 30);
+      renderHero(moviesList[0]);
+      renderSections();
+    } catch (e) { console.error(e); }
+    document.getElementById('spinner').classList.remove('active');
+  }
+
+  function renderHero(movie) {
+    if (!movie || currentCategory !== 'movie' || searchQuery) {
       document.getElementById('heroBanner').style.display = 'none';
       return;
     }
     const heroDiv = document.getElementById('heroBanner');
     heroDiv.style.display = 'flex';
-    heroDiv.style.backgroundImage = `linear-gradient(to right, rgba(0,0,0,0.9), rgba(0,0,0,0.5)), url(${title.primaryImage?.url || ''})`;
+    heroDiv.style.backgroundImage = `linear-gradient(to right, rgba(0,0,0,0.85), rgba(0,0,0,0.4)), url(${BACKDROP_BASE}${movie.backdrop_path || movie.poster_path})`;
     heroDiv.innerHTML = `
       <div class="hero-content">
-        <div class="hero-title">${title.primaryTitle || title.originalTitle}</div>
-        <div class="hero-meta"><span class="match">98% Match</span> <span>${title.startYear || ''}</span> <span>${title.runtimeSeconds ? Math.floor(title.runtimeSeconds/60)+' min' : ''}</span></div>
-        <div class="hero-desc">${title.plot?.substring(0, 180) || 'No description available.'}</div>
-        <div class="hero-buttons"><button class="btn-play" data-id="${title.id}">▶ Play</button><button class="btn-add" data-id="${title.id}">+ My List</button></div>
+        <div class="hero-title">${movie.title || movie.name}</div>
+        <div class="hero-meta"><span class="match">${Math.round(movie.vote_average * 10)}% Match</span> <span>${(movie.release_date || movie.first_air_date || '').slice(0,4)}</span></div>
+        <div class="hero-desc">${movie.overview?.substring(0, 180) || 'No description available.'}</div>
+        <div class="hero-buttons">
+          <button class="btn-play" data-id="${movie.id}" data-type="movie">▶ Play</button>
+          <button class="btn-watchlist" data-id="${movie.id}" data-title="${movie.title}" data-poster="${IMG_BASE}${movie.poster_path}" data-year="${(movie.release_date || '').slice(0,4)}">+ My List</button>
+        </div>
       </div>
     `;
-    document.querySelector('.hero-buttons .btn-play')?.addEventListener('click', () => playNow(title.id, 'movie', title.primaryTitle));
-    document.querySelector('.hero-buttons .btn-add')?.addEventListener('click', () => toggleWatchlist(title.id, title.primaryTitle, title.primaryImage?.url, title.startYear));
+    document.querySelector('.hero-buttons .btn-play')?.addEventListener('click', () => playNow(movie.id, 'movie', movie.title));
+    document.querySelector('.hero-buttons .btn-watchlist')?.addEventListener('click', (e) => {
+      const btn = e.target;
+      toggleWatchlist(btn.dataset.id, btn.dataset.title, btn.dataset.poster, btn.dataset.year, 'movie');
+    });
   }
-  
+
   function renderSections() {
     const container = document.getElementById('contentSections');
     container.innerHTML = '';
-    
+
     if (currentCategory === 'continue') {
       renderContinueWatching(container);
       return;
@@ -667,40 +661,40 @@
       renderWatchlist(container);
       return;
     }
-    
-    let items = currentCategory === 'movie' ? allMovies : allShows;
+
+    let items = currentCategory === 'movie' ? moviesList : tvList;
     if (searchQuery) {
-      items = items.filter(i => (i.primaryTitle || i.originalTitle || '').toLowerCase().includes(searchQuery.toLowerCase()));
+      items = items.filter(i => (i.title || i.name || '').toLowerCase().includes(searchQuery.toLowerCase()));
     }
     if (selectedGenre && selectedGenre !== 'All') {
-      items = items.filter(i => i.genres?.includes(selectedGenre));
+      items = items.filter(i => i.genre_ids?.includes(parseInt(genreToId[selectedGenre]) || 28));
     }
-    
+
+    if (items.length === 0) {
+      container.innerHTML = '<div class="empty-state">🎬 No results found. Try a different search!</div>';
+      return;
+    }
+
     const section = document.createElement('div');
     section.className = 'section';
-    section.innerHTML = `<div class="section-header"><h2 class="section-title">${currentCategory === 'movie' ? 'Trending Movies' : 'Popular TV Shows'}</h2></div><div class="scroll-x" id="scrollGrid"></div>`;
+    section.innerHTML = `<div class="section-header"><h2 class="section-title">${currentCategory === 'movie' ? 'Popular Movies' : 'Popular TV Shows'}</h2></div><div class="scroll-x" id="scrollGrid"></div>`;
     container.appendChild(section);
     const grid = section.querySelector('#scrollGrid');
     items.forEach(item => {
-      const card = createCard(item, currentCategory);
+      const card = document.createElement('div');
+      card.className = 'movie-card';
+      card.innerHTML = `
+        <img class="card-poster" src="${IMG_BASE}${item.poster_path || ''}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x450?text=No+Poster'">
+        <div class="card-title">${item.title || item.name}</div>
+      `;
+      card.addEventListener('click', () => showModal(item.id, currentCategory === 'movie' ? 'movie' : 'tv'));
       grid.appendChild(card);
     });
   }
-  
-  function createCard(item, type) {
-    const div = document.createElement('div');
-    div.className = 'movie-card';
-    div.innerHTML = `
-      <img class="card-poster" src="${item.primaryImage?.url || 'https://via.placeholder.com/300x450?text=No+Poster'}" loading="lazy">
-      <div class="card-title">${item.primaryTitle || item.originalTitle}</div>
-    `;
-    div.addEventListener('click', () => showModal(item.id, type));
-    return div;
-  }
-  
+
   function renderContinueWatching(container) {
     if (!continueWatching.length) {
-      container.innerHTML = '<div style="text-align:center;padding:80px;">🎬 No continue watching yet. Start a movie!</div>';
+      container.innerHTML = '<div class="empty-state">🎬 No continue watching history. Start watching something!</div>';
       return;
     }
     const section = document.createElement('div');
@@ -711,15 +705,18 @@
     continueWatching.forEach(item => {
       const card = document.createElement('div');
       card.className = 'movie-card';
-      card.innerHTML = `<img class="card-poster" src="${item.poster || 'https://via.placeholder.com/300x450'}" loading="lazy"><div class="card-title">${item.title}</div><div style="font-size:12px;color:#46d369;">${Math.floor(item.progress/60)} min watched</div>`;
-      card.addEventListener('click', () => resumePlay(item));
+      card.innerHTML = `<img class="card-poster" src="${item.poster}" loading="lazy"><div class="card-title">${item.title}</div>`;
+      card.addEventListener('click', () => {
+        if (item.type === 'movie') playNow(item.id, 'movie', item.title);
+        else playNow(item.id, 'tv', item.title, item.season || 1, item.episode || 1);
+      });
       grid.appendChild(card);
     });
   }
-  
+
   function renderWatchlist(container) {
     if (!watchlist.length) {
-      container.innerHTML = '<div style="text-align:center;padding:80px;">📋 Your watchlist is empty. Add movies you love!</div>';
+      container.innerHTML = '<div class="empty-state">📋 Your watchlist is empty. Add movies and shows you love!</div>';
       return;
     }
     const section = document.createElement('div');
@@ -735,11 +732,11 @@
       grid.appendChild(card);
     });
   }
-  
+
   function renderGenreFilters() {
     const container = document.getElementById('genreFilter');
     container.innerHTML = '<div class="genre-chip" data-genre="All">All</div>';
-    Object.keys(genreMap).forEach(g => {
+    genres.forEach(g => {
       const chip = document.createElement('div');
       chip.className = `genre-chip ${selectedGenre === g ? 'active' : ''}`;
       chip.innerText = g;
@@ -752,128 +749,108 @@
       container.appendChild(chip);
     });
   }
-  
-  // ---------- Modal with Actors, Episodes etc ----------
-  async function showModal(imdbId, type) {
+
+  async function showModal(id, type) {
     const modal = document.getElementById('detailModal');
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
     try {
-      const data = await getTitleDetails(imdbId);
-      currentModalData = data;
-      document.getElementById('modalBanner').style.backgroundImage = `url(${data.primaryImage?.url || ''})`;
-      document.getElementById('modalTitle').innerText = data.primaryTitle || data.originalTitle;
-      document.getElementById('modalStats').innerHTML = `${data.startYear || ''} • ${data.runtimeSeconds ? Math.floor(data.runtimeSeconds/60)+' min' : ''} • <span class="modal-rating">⭐ ${data.rating?.aggregateRating || 'N/A'}/10</span>`;
-      document.getElementById('modalDesc').innerText = data.plot || 'No description.';
+      const endpoint = type === 'movie' ? `/movie/${id}` : `/tv/${id}`;
+      const data = await fetchTMDB(endpoint);
+      const credits = await fetchTMDB(`${endpoint}/credits`);
+      currentModalData = { ...data, type, id };
+      
+      document.getElementById('modalBanner').style.backgroundImage = `url(${BACKDROP_BASE}${data.backdrop_path || data.poster_path})`;
+      document.getElementById('modalTitle').innerText = data.title || data.name;
+      document.getElementById('modalStats').innerHTML = `${(data.release_date || data.first_air_date || '').slice(0,4)} • ${data.runtime || ''} min • <span class="modal-rating">⭐ ${data.vote_average?.toFixed(1)}/10</span>`;
+      document.getElementById('modalDesc').innerText = data.overview || 'No description available.';
       
       let actorsHtml = '<div class="modal-info-item"><strong>Cast</strong><div class="actors-list">';
-      (data.stars || []).slice(0,5).forEach(actor => {
-        actorsHtml += `<span class="actor-chip" data-nameid="${actor.id}">${actor.displayName || actor.name}</span>`;
+      (credits.cast || []).slice(0,6).forEach(actor => {
+        actorsHtml += `<span class="actor-chip" data-name="${actor.name}" data-char="${actor.character}">${actor.name}</span>`;
       });
       actorsHtml += '</div></div>';
-      let directorsStr = (data.directors || []).map(d => d.displayName).join(', ') || 'N/A';
-      let genresStr = (data.genres || []).join(', ');
+      
+      let directors = (credits.crew || []).filter(c => c.job === 'Director').map(d => d.name).join(', ') || 'N/A';
+      let genresList = (data.genres || []).map(g => g.name).join(', ');
+      
       document.getElementById('modalInfoGrid').innerHTML = `
         ${actorsHtml}
-        <div class="modal-info-item"><strong>Directors</strong> ${directorsStr}</div>
-        <div class="modal-info-item"><strong>Genres</strong> ${genresStr}</div>
-        <div class="modal-info-item"><strong>Languages</strong> ${(data.spokenLanguages || []).map(l=>l.name).join(', ') || 'English'}</div>
+        <div class="modal-info-item"><strong>Directors</strong> ${directors}</div>
+        <div class="modal-info-item"><strong>Genres</strong> ${genresList}</div>
+        <div class="modal-info-item"><strong>Runtime</strong> ${data.runtime || 'N/A'} min</div>
       `;
-      // attach actor clicks
+      
       document.querySelectorAll('.actor-chip').forEach(el => {
-        el.addEventListener('click', (e) => {
-          e.stopPropagation();
-          showActorProfile(el.dataset.nameid);
-        });
+        el.addEventListener('click', () => alert(`🎭 ${el.dataset.name}\nRole: ${el.dataset.char || 'Actor'}`));
       });
       
       const seasonsContainer = document.getElementById('seasonsEpisodesContainer');
-      if (type === 'tv' && data.type === 'TV_SERIES') {
-        const seasons = await getSeasonsList(imdbId);
+      if (type === 'tv' && data.seasons) {
+        const validSeasons = data.seasons.filter(s => s.season_number > 0);
         seasonsContainer.innerHTML = `<select id="seasonSelect" class="seasons-select"></select><div id="episodesList" class="episodes-list"></div>`;
         const select = document.getElementById('seasonSelect');
-        for (let i = 1; i <= (data.numberOfSeasons || 1); i++) {
-          select.innerHTML += `<option value="${i}">Season ${i}</option>`;
-        }
-        select.onchange = () => loadEpisodesUI(imdbId, select.value);
-        await loadEpisodesUI(imdbId, '1');
+        validSeasons.forEach(s => {
+          select.innerHTML += `<option value="${s.season_number}">Season ${s.season_number} (${s.episode_count} episodes)</option>`;
+        });
+        select.onchange = () => loadEpisodes(id, select.value);
+        if (validSeasons.length) await loadEpisodes(id, validSeasons[0].season_number);
       } else {
         seasonsContainer.innerHTML = '';
       }
       
       document.getElementById('modalPlayBtn').onclick = () => {
-        if (type === 'movie') playNow(imdbId, 'movie', data.primaryTitle);
-        else playNow(imdbId, 'tv', data.primaryTitle, 1, 1);
+        if (type === 'movie') playNow(id, 'movie', data.title || data.name);
+        else playNow(id, 'tv', data.name || data.title, 1, 1);
         closeModal();
       };
-      document.getElementById('modalSaveBtn').onclick = () => toggleWatchlist(imdbId, data.primaryTitle, data.primaryImage?.url, data.startYear, type);
-    } catch(err) { console.error(err); closeModal(); }
+      document.getElementById('modalSaveBtn').onclick = () => toggleWatchlist(id, data.title || data.name, `${IMG_BASE}${data.poster_path}`, (data.release_date || data.first_air_date || '').slice(0,4), type);
+    } catch (err) { console.error(err); closeModal(); }
   }
-  
-  async function getSeasonsList(tvId) {
+
+  async function loadEpisodes(tvId, seasonNum) {
     try {
-      const data = await getTitleDetails(tvId);
-      return data.numberOfSeasons || 1;
-    } catch(e) { return 1; }
-  }
-  
-  async function loadEpisodesUI(tvId, seasonNum) {
-    const episodes = await getEpisodes(tvId, seasonNum);
-    const container = document.getElementById('episodesList');
-    if (!container) return;
-    container.innerHTML = episodes.map(ep => `
-      <div class="episode-item" data-season="${seasonNum}" data-epnum="${ep.episodeNumber || 1}" data-ep-title="${ep.title || 'Episode'}">
-        <img class="episode-img" src="${ep.primaryImage?.url || ''}" onerror="this.src='https://via.placeholder.com/140x80'">
-        <div><strong>${ep.episodeNumber}. ${ep.title}</strong><br><span style="font-size:13px;color:#aaa;">${ep.plot?.substring(0,80) || ''}</span></div>
-      </div>
-    `).join('');
-    document.querySelectorAll('.episode-item').forEach(el => {
-      el.addEventListener('click', () => {
-        const epNum = parseInt(el.dataset.epnum);
-        playNow(tvId, 'tv', currentModalData?.primaryTitle, parseInt(seasonNum), epNum);
-        closeModal();
+      const data = await fetchTMDB(`/tv/${tvId}/season/${seasonNum}`);
+      const container = document.getElementById('episodesList');
+      if (!container) return;
+      container.innerHTML = (data.episodes || []).map(ep => `
+        <div class="episode-item" data-season="${seasonNum}" data-epnum="${ep.episode_number}">
+          <img class="episode-img" src="${IMG_BASE}${ep.still_path}" onerror="this.src='https://via.placeholder.com/140x80'">
+          <div><strong>${ep.episode_number}. ${ep.name}</strong><br><span style="font-size:13px;color:#aaa;">${ep.overview?.substring(0,80) || ''}</span></div>
+        </div>
+      `).join('');
+      document.querySelectorAll('.episode-item').forEach(el => {
+        el.addEventListener('click', () => {
+          playNow(tvId, 'tv', currentModalData?.name || currentModalData?.title, parseInt(el.dataset.season), parseInt(el.dataset.epnum));
+          closeModal();
+        });
       });
-    });
+    } catch (e) { console.error(e); }
   }
-  
-  async function showActorProfile(nameId) {
-    const actor = await getActorDetails(nameId);
-    if (!actor) return;
-    alert(`🎭 ${actor.displayName}\n📖 ${actor.biography?.substring(0, 200) || 'No bio available'}\n⭐ Known for: ${(actor.primaryProfessions || []).join(', ')}`);
-  }
-  
-  // Playback & Progress
-  function playNow(imdbId, type, title, season = null, episode = null) {
+
+  function playNow(id, type, title, season = null, episode = null) {
     const overlay = document.getElementById('playerOverlay');
     const iframe = document.getElementById('playerFrame');
     let url = '';
     if (type === 'movie') {
-      url = `${VIDAPI_MOVIE}${imdbId}?autoplay=true&primarycolor=E50914&icons=netflix&title=true`;
+      url = `${VIDAPI_MOVIE}${id}?autoplay=true&primarycolor=E50914&icons=netflix&title=true`;
     } else {
-      url = `${VIDAPI_TV}${imdbId}/${season}/${episode}?autoplay=true&primarycolor=E50914&icons=netflix`;
+      url = `${VIDAPI_TV}${id}/${season}/${episode}?autoplay=true&primarycolor=E50914&icons=netflix`;
     }
     iframe.src = url;
     overlay.classList.add('active');
     document.body.style.overflow = 'hidden';
-    // save continue watching (mock progress)
-    saveProgress(imdbId, title, type, season, episode);
-  }
-  
-  function saveProgress(id, title, type, season, episode) {
+    
+    // Save to continue watching
     let existing = continueWatching.find(c => c.id === id && c.type === type);
     if (!existing) {
-      continueWatching.unshift({ id, title, type, season, episode, progress: 0, poster: '' });
+      continueWatching.unshift({ id, title, type, season, episode, poster: '', progress: 0 });
       continueWatching = continueWatching.slice(0, 20);
       localStorage.setItem('sv_continue', JSON.stringify(continueWatching));
     }
   }
-  
-  function resumePlay(item) {
-    if (item.type === 'movie') playNow(item.id, 'movie', item.title);
-    else playNow(item.id, 'tv', item.title, item.season || 1, item.episode || 1);
-  }
-  
-  function toggleWatchlist(id, title, poster, year, type = 'movie') {
+
+  function toggleWatchlist(id, title, poster, year, type) {
     const exists = watchlist.find(w => w.id === id);
     if (exists) {
       watchlist = watchlist.filter(w => w.id !== id);
@@ -882,46 +859,52 @@
     }
     localStorage.setItem('sv_watchlist', JSON.stringify(watchlist));
     if (currentCategory === 'watchlist') renderSections();
-    alert(exists ? 'Removed from My List' : 'Added to My List');
   }
-  
+
   function closeModal() {
     document.getElementById('detailModal').classList.remove('active');
     document.body.style.overflow = '';
   }
+
   function closePlayer() {
     document.getElementById('playerOverlay').classList.remove('active');
     document.getElementById('playerFrame').src = '';
     document.body.style.overflow = '';
   }
-  
-  // Event bindings
+
+  // Event Listeners
   document.getElementById('closeModalBtn').addEventListener('click', closeModal);
   document.getElementById('exitPlayerBtn').addEventListener('click', closePlayer);
+  
   document.querySelectorAll('.nav-link').forEach(link => {
     link.addEventListener('click', () => {
       document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
       link.classList.add('active');
       currentCategory = link.dataset.category;
       searchQuery = '';
-      document.getElementById('searchInput').value = '';
       selectedGenre = '';
+      document.getElementById('searchInput').value = '';
+      document.getElementById('heroBanner').style.display = 'none';
       if (currentCategory === 'movie' || currentCategory === 'tv') {
-        loadHome();
+        renderSections();
       } else {
         renderSections();
-        document.getElementById('heroBanner').style.display = 'none';
       }
     });
   });
+
   document.getElementById('searchInput').addEventListener('input', (e) => {
     searchQuery = e.target.value;
-    if (currentCategory === 'movie' || currentCategory === 'tv') {
-      renderSections();
+    if (searchQuery) {
+      searchContent(searchQuery);
+    } else {
+      loadInitialData();
     }
   });
+
+  const genreToId = { 'Action': 28, 'Adventure': 12, 'Animation': 16, 'Comedy': 35, 'Crime': 80, 'Documentary': 99, 'Drama': 18, 'Family': 10751, 'Fantasy': 14, 'Horror': 27, 'Romance': 10749, 'Sci-Fi': 878, 'Thriller': 53 };
   
-  loadHome();
+  loadInitialData();
 </script>
 </body>
 </html>
