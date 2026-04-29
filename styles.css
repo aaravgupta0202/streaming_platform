@@ -17,27 +17,41 @@ input {
   border:none;
 }
 
-.hero {
-  height:60vh;
+/* HERO */
+#hero {
+  height:65vh;
   background-size:cover;
+  background-position:center;
   position:relative;
+}
+
+#hero::after {
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(to top,#0a0a0f,transparent);
 }
 
 .hero-content {
   position:absolute;
-  bottom:20px;
-  left:20px;
+  bottom:40px;
+  left:40px;
 }
 
+.hero-content h1 {
+  font-size:40px;
+}
+
+/* ROWS */
 .row {
   display:flex;
   overflow-x:auto;
-  gap:10px;
+  gap:12px;
   padding:10px;
 }
 
 .card {
-  min-width:140px;
+  min-width:150px;
   cursor:pointer;
 }
 
@@ -46,8 +60,8 @@ input {
   border-radius:10px;
 }
 
-/* Modal */
-.modal {
+/* MODAL */
+#modal {
   position:fixed;
   inset:0;
   background:rgba(0,0,0,0.9);
@@ -56,8 +70,15 @@ input {
   align-items:center;
 }
 
-/* Player */
-#playerOverlay {
+.modal-box {
+  background:#111;
+  padding:20px;
+  max-width:600px;
+  border-radius:10px;
+}
+
+/* PLAYER */
+#player {
   position:fixed;
   inset:0;
   background:black;
@@ -67,8 +88,8 @@ input {
   display:none;
 }
 
-/* Mobile */
-@media (max-width:600px) {
-  .hero { height:40vh; }
-  .card { min-width:110px; }
+/* MOBILE */
+@media(max-width:600px){
+  #hero { height:40vh; }
+  .hero-content h1 { font-size:24px; }
 }
